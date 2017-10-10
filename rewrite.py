@@ -4,7 +4,7 @@ import os
 #file = file directory of the file you want to rewrite example ./input/blahblah.xml
 #outfile = file directory where you want to store the rewrited file example ./output/blahblah.xml
 def rewrite(file,outfile):
-    print("parsing xml in tree of each file...")
+    print("parsing " + file + "in tree...")
     tree = ET.parse(file)
     root = tree.getroot()
     medlineCitationGetlist = ['PMID','MedlineJournalInfo','DateCreated','Article','KeywordList','OtherAbstract','MeshHeadingList']
