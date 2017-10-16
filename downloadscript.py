@@ -55,7 +55,10 @@ def dlext(filenumber):
         mdWebFile = urllib.request.urlopen(mdurl)
         mdline = mdWebFile.read().decode("utf-8").split(" ")
         if md5 == mdline:
-              
+            check = True
+            print()
+        else:
+            check = False  
         
         print('unzipping ' + file)
         with gzip.open(path, "rb") as zf:
