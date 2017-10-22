@@ -53,22 +53,32 @@ def dlext(filenumber):
         md5 = MD5(path)
         mdurl = 'ftp://ftp.ncbi.nlm.nih.gov/pubmed/baseline/' + file + ".md5"
         mdWebFile = urllib.request.urlopen(mdurl)
-        mdline = mdWebFile.read().decode("utf-8").split(" ")
-        if md5 == mdline:
+        mdline = mdWebFile.read().decode("utf-8").strip().split(" ")
+        if md5 == mdline[1]:
             check = True
-            print()
+            print(file + " isn't corrupt.")
         else:
-            check = False  
+            check = False
+            if os.path.exists('logfile.txt'):
+                append_write = 'a'
+            else:
+                append_write = 'w'
+            # Don't know what we must return.
+            log = open("logfile.txt",append_write)
+            log.write(file + " IS CORRUPT\n")
+            log.close()
+            print(file + " is corrupt !!!")
         
-        print('unzipping ' + file)
-        with gzip.open(path, "rb") as zf:
-            unzipfile = "medline17n" + number + ".xml"
-            if not os.path.exists('./src/raw'):
-                os.makedirs('./src/raw')
-            unzippath = os.path.join('./src/raw', unzipfile)
-            with open(unzippath,"wb") as of:
-                of.write(zf.read())
-            print('unzipped ' + file)
+        if check:
+            print('unzipping ' + file)
+            with gzip.open(path, "rb") as zf:
+                unzipfile = "medline17n" + number + ".xml"
+                if not os.path.exists('./src/raw'):
+                    os.makedirs('./src/raw')
+                unzippath = os.path.join('./src/raw', unzipfile)
+                with open(unzippath,"wb") as of:
+                    of.write(zf.read())
+                print('unzipped ' + file)
 
         time.sleep(20)
         return unzippath
