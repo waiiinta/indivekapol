@@ -6,17 +6,17 @@ except ImportError:
     import xml.etree.ElementTree as ET
 
 #filepath = xml file you want to count tfidf
-#savevocab = where to save the list of vocabulary
-#savelog = where to save the frequency
-#def tfidf(filepath,savelog):
-filepath = './src/test.xml'
-context = ET.iterparse(filepath)
-txt = [x.text for event,x in context if x.tag == 'ArticleTitle' ]
+#returns the sparse matrix of the tf idf
+def tfidf(filepath,tag):
+    filepath = './src/test.xml'
+    context = ET.iterparse(filepath)
+    txt = [x.text for event,x in context if x.tag == tag ]
 
-count_vect = CountVectorizer()
-train_count = count_vect.fit_transform(txt)
+    count_vect = CountVectorizer()
+    train_count = count_vect.fit_transform(txt)
 
-tfidf_transformer = TfidfTransformer()
-train_tfidf = tfidf_transformer.fit_transform(train_count)
-print(count_vect.vocabulary_)
-print(train_tfidf)
+    tfidf_transformer = TfidfTransformer()
+    train_tfidf = tfidf_transformer.fit_transform(train_count)
+    
+    return train_tfidf
+
