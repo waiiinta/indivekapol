@@ -14,15 +14,14 @@ file = "medline"
 #if download is successful, it will extract the file and return the unzipped path
 #if download is failed, it will return "DOWNLOAD FAILED"
 
-def MD5(fname):
+def MD5(path):
     hash_md5 = hashlib.md5()
-    path = os.path.join("./src/zip",fname)
     with open(path,"rb") as f:
         for chunk in iter(lambda: f.read(4096),b""):
             hash_md5.update(chunk)
         return hash_md5.hexdigest()
 
-def dlext(filenumber):
+def dlext(filenumber,logfile):
     downloaded = False
     number = "{:04}".format(filenumber)
     file = "medline17n" + number + ".xml.gz"
@@ -32,24 +31,29 @@ def dlext(filenumber):
     path = os.path.join("./src/zip",file)
     
     print("Downloading "+file)
+    logfile.write("Downloading" + file + "\r\n")
     trycount = 0
     while(trycount<5):
         try:
             urllib.request.urlretrieve(url,path,reporthook)
             break
-        except urllib.error.ContentTooShortError:
+        except:
             print('Download failed for some reason, retrying')
+            logfile.write('Download failed for some reason, retrying\r\n')
             trycount+=1
             continue
     if trycount < 5:
         print(file + " Downloaded")
+        logfile.write(file + " Downloaded\r\n")
         downloaded = True
     else:
         print('download retry limit reached')
+        logfile.write('download retry limit reached\r\n')
         os.remove(path)
 
     if downloaded:
         print("checking"+file+"isn't corrupt")
+        logfile.write("checking"+file+"isn't corrupt\r\n")
         md5 = MD5(path)
         mdurl = 'ftp://ftp.ncbi.nlm.nih.gov/pubmed/baseline/' + file + ".md5"
         mdWebFile = urllib.request.urlopen(mdurl)
@@ -57,20 +61,23 @@ def dlext(filenumber):
         if md5 == mdline[1]:
             check = True
             print(file + " isn't corrupt.")
+            logfile.write(file + " isn't corrupt\r\n")
         else:
             check = False
-            if os.path.exists('logfile.txt'):
-                append_write = 'a'
-            else:
-                append_write = 'w'
+            # if os.path.exists('logfile.txt'):
+            #     append_write = 'a'
+            # else:
+            #     append_write = 'w'
             # Don't know what we must return.
-            log = open("logfile.txt",append_write)
-            log.write(file + " IS CORRUPT\n")
-            log.close()
+            # log = open("logfile.txt",append_write)
+            # log.write(file + " IS CORRUPT\n")
+            # log.close()
             print(file + " is corrupt !!!")
+            logfile.write(file + " is corrupt !!!\r\n")
         
         if check:
             print('unzipping ' + file)
+            logfile.write('unzipping ' + file+"\r\n")
             with gzip.open(path, "rb") as zf:
                 unzipfile = "medline17n" + number + ".xml"
                 if not os.path.exists('./src/raw'):
@@ -79,6 +86,7 @@ def dlext(filenumber):
                 with open(unzippath,"wb") as of:
                     of.write(zf.read())
                 print('unzipped ' + file)
+                logfile.write('unzipped ' + file+ "\r\n")
 
         time.sleep(20)
         return unzippath
