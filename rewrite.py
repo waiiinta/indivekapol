@@ -8,6 +8,7 @@ def rewrite(file,outfile):
     tree = ET.parse(file)
     root = tree.getroot()
     medlineCitationGetlist = ['PMID','MedlineJournalInfo','DateCreated','Article','KeywordList','OtherAbstract','MeshHeadingList']
+    medlineCitationRmlist = ['DateCompleted','DateRevised','MedlineJournalInfo','ChemicalList','CitationSubset']
 
 
     #looping PubmedArticleSet
