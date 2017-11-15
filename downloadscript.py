@@ -41,6 +41,7 @@ def dlext(filenumber,logfile):
             print('Download failed for some reason, retrying')
             logfile.write('Download failed for some reason, retrying\r\n')
             trycount+=1
+            time.sleep(30)
             continue
     if trycount < 5:
         print(file + " Downloaded")
