@@ -4,9 +4,11 @@ import rewrite as rew
 import time
 import os
 
+logdirectory = './logs'
 counterfile = './logs/currentcounter.log'
 logfile = "./logs/logfile.log"
 if not os.path.exists(counterfile):
+    os.makedirs('./logs')
     fr = open(counterfile,"w+")
     fr.write("1")
     fr.close()
@@ -19,7 +21,6 @@ for num in range(count,10):
         number = "{:04}".format(num)
         foldername = "medline17n" + number
         logs = open(logfile,"a+")
-        print("WTF")
         extfile = dl.dlext(num,logs)
         if extfile == 'DOWNLOAD FAILED':
             logs.write(foldername + "download failed\r\n")
