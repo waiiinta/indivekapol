@@ -34,6 +34,7 @@ def dlext(filenumber,logfile):
     logfile.write("Downloading" + file + "\r\n")
     trycount = 0
     while(trycount<5):
+        time.sleep(90)
         try:
             urllib.request.urlretrieve(url,path,reporthook)
             break
