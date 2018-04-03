@@ -24,7 +24,7 @@ def MD5(path):
 def dlext(filenumber,logfile):
     downloaded = False
     number = "{:04}".format(filenumber)
-    file = "medline17n" + number + ".xml.gz"
+    file = "pubmed18n" + number + ".xml.gz"
     url = 'ftp://ftp.ncbi.nlm.nih.gov/pubmed/baseline/' + file
     if not os.path.exists('./src/zip'):
             os.makedirs('./src/zip')
@@ -34,7 +34,7 @@ def dlext(filenumber,logfile):
     logfile.write("Downloading" + file + "\r\n")
     trycount = 0
     while(trycount<5):
-        time.sleep(90)
+        time.sleep(1)
         try:
             urllib.request.urlretrieve(url,path,reporthook)
             break
@@ -42,7 +42,7 @@ def dlext(filenumber,logfile):
             print('Download failed for some reason, retrying')
             logfile.write('Download failed for some reason, retrying\r\n')
             trycount+=1
-            time.sleep(30)
+            time.sleep(3)
             continue
     if trycount < 5:
         print(file + " Downloaded")
@@ -90,7 +90,7 @@ def dlext(filenumber,logfile):
                 print('unzipped ' + file)
                 logfile.write('unzipped ' + file+ "\r\n")
 
-        time.sleep(20)
+        time.sleep(2)
         return unzippath
     else:
         #????? what should we return????
@@ -105,3 +105,4 @@ def reporthook(blocknum, blocksize, totalsize):
             print()
     else: # total size is unknown
         print('total size is unknown. Downloading...')
+

@@ -16,7 +16,7 @@ if not os.path.exists(counterfile):
 with open(counterfile,"r") as r:
     count = int(r.readline())
 
-for num in range(count,10):
+for num in range(count,100):
     try:
         number = "{:04}".format(num)
         foldername = "medline17n" + number
