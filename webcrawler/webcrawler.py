@@ -246,7 +246,7 @@ def delete_until_found(name,file):
         print("Update "+file)
         r_file = open(file,"r")
         tool_text = r_file.readlines()
-        start = tool_text.index(name+"\n")
+        start = tool_text.index(name)
         after_delete_text = tool_text[start:]
         r_file.close()
         w_file = open(file,"w")
@@ -278,17 +278,18 @@ def get_tool_pmid():
                                 if pmid.text[0:4] == "PMID":
                                         print(pmid.text)
                                         pmid_file.write(pmid.text[6:]+"\n")
-                        time.sleep(1)
+                        time.sleep(0.5)
                 remove_redundant_tool_stage("omictool_pmid.txt")
                 print("Finsh Crawl PMID")
         except:
                 log = open("./logs/pmid_state.txt","w+")
                 log.write(state)
                 log.close()
+                raise
 
 def main():
-        get_tool_pmid()
-
+        remove_redundant_tool_stage("omictool_pmid.txt")
+                
 main()
 
 
