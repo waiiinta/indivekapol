@@ -9,8 +9,11 @@ counterfile = './logs/currentcounter.log'
 logfile = "./logs/logfile.log"
 rewrite_counter ='./logs/rewrite.log'
 
+#download_and_unzip function will download medline zip file from ftp://ftp.ncbi.nlm.nih.gov/pubmed/baseline/ and unzip it.
+#this function will download 100 file per time which the start file number is the last file that we already downloaded plus one.
 def download_and_unzip():
 
+    #Create log file to save the current stage of running
     if not os.path.exists(counterfile):
         os.makedirs('./logs')
         fr = open(counterfile,"w+")
@@ -32,40 +35,46 @@ def download_and_unzip():
                 logs.write(foldername + "download completed\r\n")
                 
             logs.close()
-            fr=open(counterfile, "w")
-            fr.write(str(num+1))
-            fr.close()
+            counter=open(counterfile, "w")
+            counter.write(str(num+1))
+            counter.close()
         except Exception as e:
             print(e)
-            fr2 = open(logfile,"a+")
-            fr2.write(str(e))
-            fr2.close()
-            fr = open(counterfile, "w")
-            fr.write(str(num))
-            fr.close()
+            error_logs = open(logfile,"a+")
+            error_logs.write(str(e))
+            error_logs.close()
+            error_counter = open(counterfile, "w")
+            error_counter.write(str(num))
+            error_counter.close()
             break
         finally:
             logs.close()
-            fr.close()
+            counter.close()
 
-def splitfile(start,end):  
+#splitfile function will split the raw xml file in the range of start and end input.
+#start is the number of begining raw xml file that we want to split
+def splitfile(start,end):
+
+    #Loop of unzipped xml file that we want to split.  
     for num in range(start,end+1):
         if not os.path.exists('./src/split'):
             os.makedirs('./src/split')
         number = "{:04}".format(num)
-        filename = "medline17n"+number+".xml"
-        filelocation = "./src/raw/"+filename
-        outfolder = "./src/split/"+"medline"+number
+        filename = "medline17n"+number+".xml" #name of unzipped xml file.
+        filelocation = "./src/raw/"+filename #path of unzipped xml file.
+        outfolder = "./src/split/"+"medline"+number #path of folder that we want to save the split file.
         spl.splitxml(filelocation,outfolder)
 
+#rewrite_xml function will rewrite your splitted xml file with the range of last rewrite file number plus one
+# and the end folder number input.
 def rewrite_xml(endfolder_number):
 
     if not os.path.exists(rewrite_counter):
         if not os.path.exists('./logs'):
             os.makedirs('./logs')
-        fr = open(rewrite_counter,"w+")
-        fr.write("1 1")
-        fr.close()
+        rw_counter = open(rewrite_counter,"w+")
+        rw_counter.write("1 1")
+        rw_counter.close()
 
     with open(rewrite_counter,"r") as r:
         folder_number,tool_number = [int(i) for i in  r.readline().strip().split()]
@@ -90,6 +99,7 @@ def rewrite_xml(endfolder_number):
             fr = open(rewrite_counter, "w")
             fr.write(str(num+1)+" "+str(1))
             fr.close()
+
 def main():
     #download_and_unzip()
     start_folder = 30
