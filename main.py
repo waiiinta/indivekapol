@@ -7,9 +7,10 @@ import os
 logdirectory = './logs'
 counterfile = './logs/currentcounter.log'
 logfile = "./logs/logfile.log"
+rewrite_counter ='./logs/rewrite.log'
 
 def download_and_unzip():
-    
+
     if not os.path.exists(counterfile):
         os.makedirs('./logs')
         fr = open(counterfile,"w+")
@@ -46,7 +47,6 @@ def download_and_unzip():
         finally:
             logs.close()
             fr.close()
-            fr2.close()
 
 def splitfile(start,end):  
     for num in range(start,end+1):
@@ -58,7 +58,43 @@ def splitfile(start,end):
         outfolder = "./src/split/"+"medline"+number
         spl.splitxml(filelocation,outfolder)
 
+def rewrite_xml(endfolder_number):
+
+    if not os.path.exists(rewrite_counter):
+        if not os.path.exists('./logs'):
+            os.makedirs('./logs')
+        fr = open(rewrite_counter,"w+")
+        fr.write("1 1")
+        fr.close()
+
+    with open(rewrite_counter,"r") as r:
+        folder_number,tool_number = [int(i) for i in  r.readline().strip().split()]
+
+    for num in range(folder_number,endfolder_number+1):
+            number = "{:04}".format(num)
+            path = "./src/split/medline"+str(number)
+            for toolnum in range(tool_number,30001):
+                try:
+                    filename = "PubmedTool"+str(toolnum)+".xml"
+                    fullname = os.path.join(path, filename)
+                    rew.rewrite(fullname)
+                except:
+                    fr = open(rewrite_counter, "w")
+                    if toolnum == 30000:
+                        toolnum = 0
+                    fr.write(str(num)+" "+str(toolnum+1))
+                    fr.close()
+                    raise
+            
+            tool_number = 1
+            fr = open(rewrite_counter, "w")
+            fr.write(str(num+1)+" "+str(1))
+            fr.close()
 def main():
-    splitfile(1,10)
+    #download_and_unzip()
+    start_folder = 30
+    end_folder = 30
+    #splitfile(start_folder,end_folder)
+    rewrite_xml(end_folder)
 
 main()
