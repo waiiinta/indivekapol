@@ -2,9 +2,8 @@ import xml.etree.ElementTree as ET
 import os
 
 #file = file directory of the file you want to rewrite example ./input/blahblah.xml
-#outfile = file directory where you want to store the rewrited file example ./output/blahblah.xml
-def rewrite(file,outfile):
-    print("parsing " + file + "in tree...")
+def rewrite(file):
+    print("parsing " + file + " in tree...")
     tree = ET.parse(file)
     root = tree.getroot()
     medlineCitationGetlist = ['PMID','MedlineJournalInfo','DateCreated','Article','KeywordList','OtherAbstract','MeshHeadingList']
@@ -28,4 +27,4 @@ def rewrite(file,outfile):
     # for child in medlineCitation:
     #     if child.tag in Medlinecitationrmlist:
     #         medlineCitation.remove(child)
-    tree.write(outfile)
+    tree.write(file,encoding="utf8")
