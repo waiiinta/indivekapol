@@ -54,8 +54,8 @@ def dlext(filenumber,logfile):
         os.remove(path)
 
     if downloaded:
-        print("checking"+file+"isn't corrupt")
-        logfile.write("checking"+file+"isn't corrupt\r\n")
+        print("checking"+file+" isn't corrupt")
+        logfile.write("checking"+file+" isn't corrupt\r\n")
         md5 = MD5(path)
         mdurl = 'ftp://ftp.ncbi.nlm.nih.gov/pubmed/baseline/' + file + ".md5"
         mdWebFile = urllib.request.urlopen(mdurl)
