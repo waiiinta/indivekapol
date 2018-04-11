@@ -22,9 +22,4 @@ def rewrite(file):
         if not child.tag in medlineCitationGetlist:
             medlineCitation.remove(child)
 
-
-
-    # for child in medlineCitation:
-    #     if child.tag in Medlinecitationrmlist:
-    #         medlineCitation.remove(child)
     tree.write(file,encoding="utf8")
