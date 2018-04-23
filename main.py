@@ -130,10 +130,10 @@ def fix_encode():
             except:
                 print("Path : "+path)
                 print("File : "+filename)
-                fr = open(rewrite_counter, "w")
+                fr = open(fix_counter, "w")
                 if tnum == 30000:
                     tnum = 0
-                fr.write(str(num)+" "+str(tnum))
+                fr.write(str(num)+" "+str(tnum+1))
                 fr.close()
                 raise
         start_tool = 1    
