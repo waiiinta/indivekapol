@@ -3,7 +3,6 @@ import os
 
 #file = file directory of the file you want to rewrite example ./input/blahblah.xml
 def rewrite(file):
-    print("parsing " + file + " in tree...")
     tree = ET.parse(file)
     root = tree.getroot()
     medlineCitationGetlist = ['PMID','MedlineJournalInfo','DateCreated','Article','KeywordList','OtherAbstract','MeshHeadingList']
@@ -11,7 +10,6 @@ def rewrite(file):
 
 
     #looping PubmedArticleSet
-    print("Rewriting...")
     medlineCitation = root[0]
 
     #remove pubMedData
@@ -22,4 +20,8 @@ def rewrite(file):
         if not child.tag in medlineCitationGetlist:
             medlineCitation.remove(child)
 
-    tree.write(file,encoding="utf8")
+    tree.write(file,encoding="utf-8")
+
+def fix_encode(file):
+    tree = ET.parse(file,parser=ET.XMLParser(encoding="utf-8"))
+    tree.write(file,encoding="utf-8")
