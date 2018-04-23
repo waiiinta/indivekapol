@@ -1,10 +1,12 @@
 import downloadscript as dl
 import SplitFile as spl
 import rewrite as rew
+import xml.etree.ElementTree as et
 import time
 import os
+import search as sh
+from shutil import copyfile
 
-logdirectory = './logs'
 counterfile = './logs/currentcounter.log'
 logfile = "./logs/logfile.log"
 rewrite_counter ='./logs/rewrite.log'
@@ -82,12 +84,15 @@ def rewrite_xml(endfolder_number):
     for num in range(folder_number,endfolder_number+1):
             number = "{:04}".format(num)
             path = "./src/split/medline"+str(number)
+            print("Rewrite split files of "+path)
             for toolnum in range(tool_number,30001):
                 try:
                     filename = "PubmedTool"+str(toolnum)+".xml"
                     fullname = os.path.join(path, filename)
                     rew.rewrite(fullname)
                 except:
+                    print("Path : "+path)
+                    print("File : "+filename)
                     fr = open(rewrite_counter, "w")
                     if toolnum == 30000:
                         toolnum = 0
@@ -100,11 +105,106 @@ def rewrite_xml(endfolder_number):
             fr.write(str(num+1)+" "+str(1))
             fr.close()
 
+def fix_encode():
+    fix_counter = './logs/fix.log'
+    if not os.path.exists(fix_counter):
+        if not os.path.exists('./logs'):
+            os.makedirs('./logs')
+        f_counter = open(fix_counter,"w+")
+        f_counter.write("1 1")
+        f_counter.close()
+
+    f_log = open(fix_counter,'r')
+    start_folder,start_tool = [int(i) for i in f_log.readline().strip().split()]
+    f_log.close()
+
+    for num in range(start_folder,465):
+        print("Fix folder number : "+str(num))
+        for tnum in range(start_tool,30001):
+            try:
+                path = "./src/split/medline"+"{:04}".format(num)
+                filename = "PubmedTool"+str(tnum)+".xml"
+                fullname = os.path.join(path, filename)
+                rew.fix_encode(fullname)
+        
+            except:
+                print("Path : "+path)
+                print("File : "+filename)
+                fr = open(rewrite_counter, "w")
+                if tnum == 30000:
+                    tnum = 0
+                fr.write(str(num)+" "+str(tnum))
+                fr.close()
+                raise
+        start_tool = 1    
+
+#
+#
+def search_and_check_pmid(start):
+    split_path = "./src/split"
+    train_path = "./src/train"
+    pmid_path = "./logs/pmid_search_list.txt"
+    state_path = "./logs/pmid_search_state.txt"
+
+    if not os.path.exists(pmid_path):
+        if not os.path.exists('./logs'):
+            os.makedirs('./logs')
+        copyfile("./webcrawler/omictool_pmid.txt",pmid_path)
+    
+    if not os.path.exists(train_path):
+        os.makedirs(train_path)
+        if not os.path.exists(train_path+"/find_pmid_with_abstract"):
+            os.makedirs(train_path+"/find_pmid_with_abstract")
+        if not os.path.exists(train_path+"/find_no_with_abstract"):
+            os.makedirs(train_path+"/find_pmid_no_abstract")
+
+    p = open(pmid_path,'r')
+    pmid_list = sorted([int(i) for i in  p.readlines()])
+    p.close()
+
+    state = open(state_path,'r')
+    start_folder,start_tool = [int(i) for i in state.readline().strip().split()]
+    pmid_remove =[]
+
+    for num in range(start_folder,464):
+        print('Search in medline number : '+str(num))
+        med = "medline"+"{:04}".format(num)
+        for tnum in range(start_tool,30001):
+            pm = "PubmedTool"+str(tnum)+".xml"
+            src_path = os.path.join(os.path.join(split_path,med),pm)
+            print(src_path)
+            try:
+                tree = et.parse(src_path)
+                root = tree.getroot()
+                if sh.check_pmid(root,pmid_list):
+                    print("Found Tool Number : "+ root.find('MedlineCitation').find('PMID').text)
+                    pmid_remove.append(int(root.find('MedlineCitation').find('PMID').text))
+                    if sh.check_abstract(root):
+                        dst_name = med+"_"+pm
+                        dst_path = os.path.join(os.path.join(train_path,"find_pmid_with_abstract"),dst_name)
+                        copyfile(src_path,dst_path)
+                    else:
+                        dst_name = med+"_"+pm
+                        dst_path = str(train_path+"/find_pmid_no_abstract"+"/"+dst_name)
+                        copyfile(src_path,dst_path)
+            except: 
+                for pmid in pmid_remove:
+                    pmid_list.remove(pmid)
+
+                print(len(pmid_list))
+
+                pmid_log = open(pmid_path,'w+')
+                for pmid in pmid_list:
+                    pmid_log.write(str(pmid)+'\n')
+
+                state_log = open(state_path,'w+')
+                state_log.write(str(num)+' '+str(tnum))
+                raise
+        start_tool = 1
+            
+
+
 def main():
-    #download_and_unzip()
-    start_folder = 30
-    end_folder = 30
-    #splitfile(start_folder,end_folder)
-    rewrite_xml(end_folder)
+    fix_encode()
 
 main()
