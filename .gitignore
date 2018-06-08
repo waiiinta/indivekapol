@@ -3,3 +3,14 @@ src/
 __pycache__/
 output/
 logs/
+test/omictool_subcategory.txt
+replica_file/omictool_tools.txt
+test/test_crawler.py
+test/test_openfile.py
+test/test_sele.py
+test/omictool_tools.txt
+test/omictool_list_page.txt
+search_2.py
+test/test_sele.txt
+test/test_md5.py
+webcrawler/findmin.py

@@ -24,7 +24,7 @@ def download_and_unzip():
     with open(counterfile,"r") as r:
         count = int(r.readline())
 
-    for num in range(count,count+100): #Variable count got from currentcounter.log, We use it to check the start file that we already downloaded.
+    for num in range(count,929): #Variable count got from currentcounter.log, We use it to check the start file that we already downloaded.
         try:
             number = "{:04}".format(num)
             foldername = "medline17n" + number
@@ -140,7 +140,7 @@ def fix_encode():
 
 #
 #
-def search_and_check_pmid(start):
+def search_and_check_pmid():
     split_path = "./src/split"
     train_path = "./src/train"
     pmid_path = "./logs/pmid_search_list.txt"
@@ -166,13 +166,13 @@ def search_and_check_pmid(start):
     start_folder,start_tool = [int(i) for i in state.readline().strip().split()]
     pmid_remove =[]
 
-    for num in range(start_folder,464):
+    for num in range(start_folder,929):
         print('Search in medline number : '+str(num))
         med = "medline"+"{:04}".format(num)
         for tnum in range(start_tool,30001):
             pm = "PubmedTool"+str(tnum)+".xml"
             src_path = os.path.join(os.path.join(split_path,med),pm)
-            print(src_path)
+            # print(src_path)
             try:
                 tree = et.parse(src_path)
                 root = tree.getroot()
@@ -201,10 +201,67 @@ def search_and_check_pmid(start):
                 state_log.write(str(num)+' '+str(tnum))
                 raise
         start_tool = 1
-            
 
+def search_and_check_non_tool():
+    split_path = "./src/split"
+    train_path = "./src/train"
+    pmid_path = "./logs/pmid_search_list.txt"
+    nontool_pmid_path = "./logs/nontool_search_list.txt"
+    state_path = "./logs/nontool_search_state.txt"
+
+    if not os.path.exists(pmid_path):
+        if not os.path.exists('./logs'):
+            os.makedirs('./logs')
+        copyfile("./webcrawler/omictool_pmid.txt",pmid_path)
+    
+    if not os.path.exists(train_path):
+        os.makedirs(train_path)
+        if not os.path.exists(train_path+"/nontool_with_abstaract"):
+            os.makedirs(train_path+"/nontool_with_abstract")
+
+    p = open(pmid_path,'r')
+    pmid_list = sorted([int(i) for i in  p.readlines()])
+    p.close()
+
+    state = open(state_path,'r')
+    start_folder,start_tool = [int(i) for i in state.readline().strip().split()]
+    nontool_pmid = open(nontool_pmid_path,'r')
+    nontool_pmid_list =[int(i) for i in  nontool_pmid.readlines()]
+    print(len(nontool_pmid_list))
+
+    for num in range(start_folder,929):
+        print('Search in medline number : '+str(num))
+        med = "medline"+"{:04}".format(num)
+        for tnum in range(start_tool,30001):
+            pm = "PubmedTool"+str(tnum)+".xml"
+            src_path = os.path.join(os.path.join(split_path,med),pm)
+            # print(src_path)
+            try:
+                tree = et.parse(src_path)
+                root = tree.getroot()
+                if  sh.check_pmid(root,pmid_list)==False and len(nontool_pmid_list) <= 200000:
+                    if sh.check_abstract(root):
+                        nontool_pmid_list.append(int(root.find('MedlineCitation').find('PMID').text))
+                        dst_name = med+"_"+pm
+                        dst_path = os.path.join(os.path.join(train_path,"nontool_with_abstract"),dst_name)
+                        copyfile(src_path,dst_path)
+            except:
+                nontool_pmid_log = open(nontool_pmid_path,'w+')
+                for pmid in nontool_pmid_list:
+                    nontool_pmid_log.write(str(pmid)+'\n')
+
+                state_log = open(state_path,'w+')
+                state_log.write(str(num)+' '+str(tnum))
+                raise
+        start_tool = 1
+
+
+def update():
+    pmid_path = "./logs/pmid_search_list.txt"
+    new_pmid_path = "./logs/sortedPMID.txt"
+    rew.update_pmid(new_pmid_path,pmid_path)
 
 def main():
-    fix_encode()
+    search_and_check_non_tool()
 
 main()
