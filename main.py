@@ -142,7 +142,7 @@ def fix_encode():
 #
 def search_and_check_pmid():
     split_path = "./src/split"
-    train_path = "./src/train"
+    train_path = "./new_src/train"
     pmid_path = "./logs/pmid_search_list.txt"
     state_path = "./logs/pmid_search_state.txt"
 
@@ -159,17 +159,17 @@ def search_and_check_pmid():
             os.makedirs(train_path+"/find_pmid_no_abstract")
 
     p = open(pmid_path,'r')
-    pmid_list = sorted([int(i) for i in  p.readlines()])
+    pmid_list = sorted([int(i.strip().split()[-1]) for i in  p.readlines()])
     p.close()
 
     state = open(state_path,'r')
     start_folder,start_tool = [int(i) for i in state.readline().strip().split()]
     pmid_remove =[]
 
-    for num in range(start_folder,929):
+    for num in range(915,929):
         print('Search in medline number : '+str(num))
         med = "medline"+"{:04}".format(num)
-        for tnum in range(start_tool,30001):
+        for tnum in range(1,30001):
             pm = "PubmedTool"+str(tnum)+".xml"
             src_path = os.path.join(os.path.join(split_path,med),pm)
             # print(src_path)
@@ -262,6 +262,6 @@ def update():
     rew.update_pmid(new_pmid_path,pmid_path)
 
 def main():
-    search_and_check_non_tool()
+    search_and_check_pmid()
 
 main()

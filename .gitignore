@@ -14,3 +14,5 @@ search_2.py
 test/test_sele.txt
 test/test_md5.py
 webcrawler/findmin.py
+*.xml
+*.txt
